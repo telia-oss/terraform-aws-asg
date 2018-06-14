@@ -12,7 +12,7 @@ data "aws_subnet_ids" "main" {
 
 module "asg" {
   source          = "../../"
-  prefix          = "your-project"
+  name_prefix     = "your-project"
   user_data       = "#!bin/bash\necho hello world"
   vpc_id          = "${data.aws_vpc.main.id}"
   subnet_ids      = ["${data.aws_subnet_ids.main.ids}"]

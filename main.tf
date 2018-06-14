@@ -2,7 +2,7 @@
 # Resources
 # ------------------------------------------------------------------------------
 resource "aws_iam_role" "main" {
-  name               = "${var.prefix}-role"
+  name               = "${var.name_prefix}-role"
   assume_role_policy = "${data.aws_iam_policy_document.main.json}"
 }
 
@@ -19,22 +19,22 @@ data "aws_iam_policy_document" "main" {
 }
 
 resource "aws_iam_instance_profile" "main" {
-  name = "${var.prefix}-profile"
+  name = "${var.name_prefix}-profile"
   role = "${aws_iam_role.main.name}"
 }
 
 resource "aws_iam_role_policy" "main" {
-  name   = "${var.prefix}-permissions"
+  name   = "${var.name_prefix}-permissions"
   role   = "${aws_iam_role.main.id}"
   policy = "${var.instance_policy}"
 }
 
 resource "aws_security_group" "main" {
-  name        = "${var.prefix}-sg"
+  name        = "${var.name_prefix}-sg"
   description = "Terraformed security group."
   vpc_id      = "${var.vpc_id}"
 
-  tags = "${merge(var.tags, map("Name", "${var.prefix}-sg"))}"
+  tags = "${merge(var.tags, map("Name", "${var.name_prefix}-sg"))}"
 }
 
 resource "aws_security_group_rule" "egress" {
@@ -47,7 +47,7 @@ resource "aws_security_group_rule" "egress" {
 }
 
 resource "aws_launch_configuration" "main" {
-  name_prefix          = "${var.prefix}-asg-"
+  name_prefix          = "${var.name_prefix}-asg-"
   instance_type        = "${var.instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.main.name}"
   security_groups      = ["${aws_security_group.main.id}"]
@@ -67,7 +67,7 @@ resource "aws_launch_configuration" "main" {
 }
 
 locals {
-  asg_tags = "${merge(var.tags, map("Name", "${var.prefix}"))}"
+  asg_tags = "${merge(var.tags, map("Name", "${var.name_prefix}"))}"
 }
 
 data "null_data_source" "autoscaling" {
@@ -82,7 +82,7 @@ data "null_data_source" "autoscaling" {
 
 resource "aws_cloudformation_stack" "main" {
   depends_on    = ["aws_launch_configuration.main"]
-  name          = "${var.prefix}-asg"
+  name          = "${var.name_prefix}-asg"
   template_body = "${data.template_file.main.rendered}"
 }
 
@@ -90,13 +90,12 @@ data "template_file" "main" {
   template = "${file("${path.module}/cloudformation.yml")}"
 
   vars {
-    prefix               = "${var.prefix}"
     launch_configuration = "${aws_launch_configuration.main.name}"
     health_check_type    = "${var.health_check_type}"
     await_signal         = "${var.await_signal}"
     pause_time           = "${var.pause_time}"
-    min_size             = "${var.instance_count}"
-    max_size             = "${var.instance_count_max}"
+    min_size             = "${var.min_size}"
+    max_size             = "${var.max_size}"
     subnets              = "${jsonencode(var.subnet_ids)}"
     tags                 = "${jsonencode(data.null_data_source.autoscaling.*.outputs)}"
   }

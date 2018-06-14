@@ -1,32 +1,12 @@
 # ------------------------------------------------------------------------------
 # Variables
 # ------------------------------------------------------------------------------
-variable "prefix" {
+variable "name_prefix" {
   description = "A prefix used for naming resources."
 }
 
-variable "user_data" {
-  description = "User data script for the launch configuration."
-  default     = ""
-}
-
-variable "health_check_type" {
-  description = "Optional: Type of health check to use - either ELB or EC2."
-  default     = "EC2"
-}
-
-variable "await_signal" {
-  description = "Await signals (WaitOnResourceSignals) for the autoscaling rolling update policy."
-  default     = "false"
-}
-
-variable "pause_time" {
-  description = "Pause time for the autoscaling rolling update policy."
-  default     = "PT5M"
-}
-
 variable "vpc_id" {
-  description = "ID of the VPC for the subnets."
+  description = "The VPC ID."
 }
 
 variable "subnet_ids" {
@@ -34,39 +14,34 @@ variable "subnet_ids" {
   type        = "list"
 }
 
+variable "user_data" {
+  description = "The user data to provide when launching the instance."
+  default     = ""
+}
+
 variable "instance_type" {
   description = "Type of instance to provision."
   default     = "t2.micro"
 }
 
-variable "instance_volume_size" {
-  description = "Size of the root block device."
-  default     = "8"
-}
-
-variable "instance_count" {
-  description = "Desired (and minimum) number of instances."
-  default     = "1"
-}
-
-variable "instance_count_max" {
-  description = "Maximum number of instances."
-  default     = "3"
-}
-
 variable "instance_ami" {
-  description = "AMI id for the launch configuration."
+  description = "The EC2 image ID to launch."
   default     = "ami-db51c2a2"
 }
 
 variable "instance_key" {
-  description = "Name of an EC2 key-pair for SSH access."
+  description = "The key name that should be used for the instance."
   default     = ""
 }
 
-// Workaround because we cannot use count since the instance policy can be computed in some cases.
+variable "instance_volume_size" {
+  description = "The size of the volume in gigabytes."
+  default     = "8"
+}
+
+// Workaround because we cannot use count since the passed policy can be computed in some cases.
 variable "instance_policy" {
-  description = "Optional: A policy document which is applied to the instance profile."
+  description = "A policy document to apply to the instance profile."
 
   default = <<EOF
 {
@@ -81,6 +56,31 @@ variable "instance_policy" {
     ]
 }
 EOF
+}
+
+variable "min_size" {
+  description = "The minimum (and desired) size of the auto scale group. "
+  default     = "1"
+}
+
+variable "max_size" {
+  description = "The maximum size of the auto scale group."
+  default     = "3"
+}
+
+variable "health_check_type" {
+  description = "EC2 or ELB. Controls how health checking is done."
+  default     = "EC2"
+}
+
+variable "await_signal" {
+  description = "Await signals (WaitOnResourceSignals) for the autoscaling rolling update policy."
+  default     = "false"
+}
+
+variable "pause_time" {
+  description = "Pause time for the autoscaling rolling update policy."
+  default     = "PT5M"
 }
 
 variable "tags" {
