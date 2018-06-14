@@ -1,5 +1,7 @@
 ## Autoscaling group
 
+[![Build Status](https://travis-ci.com/telia-oss/terraform-aws-asg.svg?branch=master)](https://travis-ci.com/telia-oss/terraform-aws-asg)
+
 Easy way of setting up an autoscaling group which supports rolling updates, which takes care of creating:
 
 
