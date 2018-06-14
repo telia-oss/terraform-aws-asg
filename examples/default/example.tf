@@ -13,10 +13,11 @@ data "aws_subnet_ids" "main" {
 module "asg" {
   source          = "../../"
   name_prefix     = "your-project"
-  user_data       = "#!bin/bash\necho hello world"
   vpc_id          = "${data.aws_vpc.main.id}"
   subnet_ids      = ["${data.aws_subnet_ids.main.ids}"]
+  instance_ami    = "ami-921423eb"
   instance_policy = "${data.aws_iam_policy_document.permissions.json}"
+  user_data       = "#!bin/bash\necho hello world"
 
   tags {
     environment = "prod"

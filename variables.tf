@@ -26,7 +26,6 @@ variable "instance_type" {
 
 variable "instance_ami" {
   description = "The EC2 image ID to launch."
-  default     = "ami-db51c2a2"
 }
 
 variable "instance_key" {
