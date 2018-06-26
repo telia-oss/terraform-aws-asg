@@ -55,6 +55,7 @@ resource "aws_launch_configuration" "main" {
   image_id             = "${var.instance_ami}"
   key_name             = "${var.instance_key}"
   user_data            = "${var.user_data}"
+  ebs_block_device     = ["${var.ebs_block_devices}"]
 
   root_block_device {
     volume_type           = "gp2"
