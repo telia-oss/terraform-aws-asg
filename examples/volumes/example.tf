@@ -11,13 +11,21 @@ data "aws_subnet_ids" "main" {
 }
 
 module "asg" {
-  source          = "../../"
-  name_prefix     = "example"
-  vpc_id          = "${data.aws_vpc.main.id}"
-  subnet_ids      = ["${data.aws_subnet_ids.main.ids}"]
-  instance_ami    = "ami-921423eb"
-  instance_policy = "${data.aws_iam_policy_document.permissions.json}"
-  user_data       = "#!bin/bash\necho hello world"
+  source               = "../../"
+  name_prefix          = "example"
+  vpc_id               = "${data.aws_vpc.main.id}"
+  subnet_ids           = ["${data.aws_subnet_ids.main.ids}"]
+  instance_ami         = "ami-921423eb"
+  instance_policy      = "${data.aws_iam_policy_document.permissions.json}"
+  instance_volume_size = "10"
+  user_data            = "#!/bin/bash\necho hello world"
+
+  ebs_block_devices = [{
+    device_name           = "/dev/xvdcz"
+    volume_type           = "gp2"
+    volume_size           = "22"
+    delete_on_termination = true
+  }]
 
   tags {
     environment = "prod"

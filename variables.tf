@@ -38,6 +38,12 @@ variable "instance_volume_size" {
   default     = "8"
 }
 
+variable "ebs_block_devices" {
+  description = "Additional EBS block devices to attach to the instance."
+  type        = "list"
+  default     = []
+}
+
 // Workaround because we cannot use count since the passed policy can be computed in some cases.
 variable "instance_policy" {
   description = "A policy document to apply to the instance profile."
@@ -58,7 +64,7 @@ EOF
 }
 
 variable "min_size" {
-  description = "The minimum (and desired) size of the auto scale group. "
+  description = "The minimum (and desired) size of the auto scale group."
   default     = "1"
 }
 
