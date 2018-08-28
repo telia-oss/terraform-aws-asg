@@ -21,7 +21,7 @@ variable "user_data" {
 
 variable "instance_type" {
   description = "Type of instance to provision."
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "instance_ami" {
