@@ -6,9 +6,9 @@ output "id" {
   value       = "${aws_cloudformation_stack.main.outputs["AsgName"]}"
 }
 
-output "role_name" {
-  description = "The name of the instance role."
-  value       = "${aws_iam_role.main.name}"
+output "role_id" {
+  description = "The id of the instance role."
+  value       = "${aws_iam_role.main.id}"
 }
 
 output "role_arn" {
@@ -17,6 +17,6 @@ output "role_arn" {
 }
 
 output "security_group_id" {
-  description = "The ID of the security group."
+  description = "The id of the security group."
   value       = "${aws_security_group.main.id}"
 }
