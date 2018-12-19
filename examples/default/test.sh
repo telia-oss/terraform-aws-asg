@@ -22,6 +22,6 @@ fi
 
 instance_count=`aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $ASG_ID | jq '.AutoScalingGroups[].Instances' | jq -s length`
 
-checkCounts $instance_count 1 "Expected # of Instances"
+check_counts $instance_count 1 "Expected # of Instances"
 
 exit $tests_failed

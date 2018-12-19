@@ -13,7 +13,7 @@ jobs:
           AWS_SESSION_TOKEN: ((telia-divx-common-services-stage-session-token))
           KMS_KEY_ID: ((telia-divx-common-services-stage-state-bucket-key))
         file: this-module/.ci/tasks/apply/task.yml
-        input_mapping: {source: terraform-aws-asg}
+        input_mapping: {source: this-module}
       - task: test
         params:
           directory: default
@@ -64,7 +64,7 @@ jobs:
   - name: test-volumes
     plan:
       - aggregate:
-        - get: terraform-aws-asg
+        - get: this-module
           trigger: true
           passed:
             - test-sample
