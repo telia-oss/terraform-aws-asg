@@ -13,7 +13,7 @@ fi
 }
 
 tests_failed=0
-
+cat terraform-out/terraform-out.json
 if [ ! -z $1 ] && [ $1 == "ci" ]
   then
   ASG_ID=`cat terraform-out/terraform-out.json |jq -r '.id.value'`
