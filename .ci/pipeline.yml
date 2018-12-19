@@ -70,7 +70,7 @@ jobs:
             - test-sample
       - task: apply
         params:
-          directory: private-subnets
+          directory: volumes
           AWS_ACCOUNT_ID: ((telia-divx-common-services-stage-account-id))
           AWS_ACCESS_KEY_ID: ((telia-divx-common-services-stage-access-key))
           AWS_SECRET_ACCESS_KEY: ((telia-divx-common-services-stage-secret-key))
@@ -80,14 +80,14 @@ jobs:
         input_mapping: {source: this-module}
       - task: test
         params:
-          directory: private-subnets
+          directory: volumes
           AWS_ACCESS_KEY_ID: ((telia-divx-common-services-stage-access-key))
           AWS_SECRET_ACCESS_KEY: ((telia-divx-common-services-stage-secret-key))
           AWS_SESSION_TOKEN: ((telia-divx-common-services-stage-session-token))
         file: this-module/.ci/tasks/test/task.yml
       - task: destroy
         params:
-          directory: private-subnets
+          directory: volumes
           AWS_ACCESS_KEY_ID: ((telia-divx-common-services-stage-access-key))
           AWS_SECRET_ACCESS_KEY: ((telia-divx-common-services-stage-secret-key))
           AWS_SESSION_TOKEN: ((telia-divx-common-services-stage-session-token))
