@@ -37,7 +37,7 @@ data "aws_ami" "linux2" {
 
 module "asg" {
   source               = "../../"
-  name_prefix          = "example"
+  name_prefix          = "asg-volumes-test"
   vpc_id               = "${data.aws_vpc.main.id}"
   subnet_ids           = ["${data.aws_subnet_ids.main.ids}"]
   instance_ami         = "${data.aws_ami.linux2.id}"
@@ -86,3 +86,8 @@ output "security_group_id" {
 output "role_arn" {
   value = "${module.asg.role_arn}"
 }
+
+output "id" {
+  value = "${module.asg.id}"
+}
+
