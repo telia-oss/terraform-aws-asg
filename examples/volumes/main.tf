@@ -106,4 +106,3 @@ output "role_arn" {
 output "id" {
   value = "${module.asg.id}"
 }
-
