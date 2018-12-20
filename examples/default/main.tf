@@ -53,7 +53,7 @@ data "aws_ami" "linux2" {
 
 module "asg" {
   source       = "../../"
-  name_prefix  = "default-test"
+  name_prefix  = "asg-default-test"
   vpc_id       = "${data.aws_vpc.main.id}"
   subnet_ids   = ["${data.aws_subnet_ids.main.ids}"]
   instance_ami = "${data.aws_ami.linux2.id}"
