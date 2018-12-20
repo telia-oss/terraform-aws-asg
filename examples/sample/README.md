@@ -1,3 +1,3 @@
-## examples/default
+## examples/sample
 
-Basic example which creates an autoscaling group in the default VPC.
+A Basic example which creates an autoscaling group in the default VPC and applies a security group.

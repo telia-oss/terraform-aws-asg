@@ -12,13 +12,11 @@ check_counts() {
 fi
 }
 tests_failed=0
-if [ $1 == 'ci' ]
-  then
-  ASG_ID=`cat terraform-out/terraform-out.json |jq -r '.id.value'`
-  export AWS_DEFAULT_REGION=eu-west-1
-  else
-  ASG_ID=`terraform output -json  |jq -r '.id.value'`
-fi
+
+ASG_ID=`cat terraform-out/terraform-out.json |jq -r '.id.value'`
+export AWS_DEFAULT_REGION=eu-west-1
+
+
 
 instance_count=`aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $ASG_ID | jq '.AutoScalingGroups[].Instances' | jq -s length`
 
