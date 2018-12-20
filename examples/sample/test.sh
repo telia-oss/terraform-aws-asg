@@ -23,7 +23,7 @@ public_ip=`aws ec2 describe-instances --filter "Name=instance-id,Values=${instan
 
 echo $public_ip
 
-if ( $(nc -zv ${public_ip} 22 2>&1 | grep -q succeeded) )
+if ( $(nc -zv ${public_ip} 22 2>&1 | grep -q open) )
   then
   echo "√ Port 22 Open on Instance"
   else

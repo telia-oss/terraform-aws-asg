@@ -26,7 +26,7 @@ instance_id=`aws autoscaling describe-auto-scaling-groups --auto-scaling-group-n
 instance_count=`aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $ASG_ID | jq '.AutoScalingGroups[].Instances' | jq -s length`
 public_ip=`aws ec2 describe-instances --filter "Name=instance-id,Values=${instance_id}"|jq -r '.Reservations[].Instances[].NetworkInterfaces[].Association.PublicIp'`
 volume_count=`aws ec2 describe-instances --filter "Name=instance-id,Values=${instance_id}"|jq '.Reservations[].Instances[].BlockDeviceMappings[].DeviceName' | jq -s length`
-if ( $(nc -zv ${public_ip} 22 2>&1 | grep -q succeeded) )
+if ( $(nc -zv ${public_ip} 22 2>&1 | grep -q open) )
   then
   echo "√ Port 22 Open on Instance"
   else
