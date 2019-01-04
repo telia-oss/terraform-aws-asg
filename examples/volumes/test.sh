@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eo pipefail
+set -euo pipefail
 
 # for integer comparisons: check_counts <testValue> <expectedValue> <testName>
 check_counts() {
