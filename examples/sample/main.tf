@@ -1,5 +1,21 @@
+terraform {
+  required_version = "0.11.11"
+
+  backend "s3" {
+    key            = "terraform-modules/development/terraform-aws-asg/sample.tfstate"
+    bucket         = "<test-account-id>-terraform-state"
+    dynamodb_table = "<test-account-id>-terraform-state"
+    acl            = "bucket-owner-full-control"
+    encrypt        = "true"
+    kms_key_id     = "<kms-key-id>"
+    region         = "eu-west-1"
+  }
+}
+
 provider "aws" {
-  region = "eu-west-1"
+  version             = "1.52.0"
+  region              = "eu-west-1"
+  allowed_account_ids = ["<test-account-id>"]
 }
 
 data "aws_vpc" "main" {
@@ -37,7 +53,7 @@ data "aws_ami" "linux2" {
 
 module "asg" {
   source          = "../../"
-  name_prefix     = "example"
+  name_prefix     = "asg-test-sample"
   vpc_id          = "${data.aws_vpc.main.id}"
   subnet_ids      = ["${data.aws_subnet_ids.main.ids}"]
   instance_ami    = "${data.aws_ami.linux2.id}"
@@ -77,4 +93,8 @@ output "security_group_id" {
 
 output "role_arn" {
   value = "${module.asg.role_arn}"
+}
+
+output "id" {
+  value = "${module.asg.id}"
 }
