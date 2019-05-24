@@ -2,7 +2,7 @@ version: '2'
 
 vars:
   TERRAFORM_VERSION: 0.12.0
-  PROVIDER_VERSION:  2.12.0
+  PROVIDER_VERSION:  2.11.0
   DIRECTORIES:
     sh: find . -type f -name '*.tf' -not -path "**/.terraform/*" -exec dirname {} \; | sort -u
   FILES:
