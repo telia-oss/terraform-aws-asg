@@ -1,0 +1,61 @@
+version: '2'
+
+vars:
+  DIRECTORIES:
+    sh: find . -type f -name '*.tf' -not -path "**/.terraform/*" -exec dirname {} \; | sort -u
+
+tasks:
+  directories:
+    desc: List terraform directories.
+    silent: true
+    cmds:
+    - echo "{{.DIRECTORIES}}"
+
+  fmt:
+    desc: Check formatting of all terraform files.
+    silent: true
+    cmds:
+    - task: command
+      vars:
+        COMMAND: terraform fmt
+        ARGS: -check=true -write=false -list=false -recursive=false
+        PIPE:
+
+  validate:
+    desc: Validate all terraform directories.
+    silent: true
+    cmds:
+    - task: command
+      vars:
+        COMMAND: terraform init
+        ARGS: -backend=false -input=false -get=true -get-plugins=true -no-color
+        PIPE: '&> /dev/null'
+    - task: command
+      vars:
+        COMMAND: terraform validate
+        ARGS: 
+        PIPE:
+    
+  test:
+    desc: Run all tests.
+    silent: true
+    cmds:
+    - task: fmt
+    - task: validate
+
+  command:
+    desc: Run a command on the directories. 
+    silent: true
+    cmds:
+    - |
+      BOLD=$(tput bold)
+      NORM=$(tput sgr0)
+
+      echo "${BOLD} {{.COMMAND}}:${NORM}"
+      for d in $(echo "{{.DIRECTORIES}}"); do 
+        if ! {{.COMMAND}} {{.ARGS}} $d {{.PIPE}}; then
+          echo "  ✗ $d"
+        else
+          echo "  √ $d"
+        fi
+      done
