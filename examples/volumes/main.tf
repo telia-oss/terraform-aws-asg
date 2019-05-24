@@ -1,5 +1,5 @@
 terraform {
-  required_version = "0.11.11"
+  required_version = "0.12.0"
 
   backend "s3" {
     key            = "terraform-modules/development/terraform-aws-asg/volumes.tfstate"
@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "aws" {
-  version             = "1.52.0"
+  version             = "2.12.0"
   region              = "eu-west-1"
   allowed_account_ids = ["<test-account-id>"]
 }
