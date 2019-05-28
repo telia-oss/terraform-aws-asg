@@ -14,10 +14,9 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
-// Work around as default cannot be ""
 variable "user_data" {
   description = "The user data to provide when launching the instance."
-  default     = "#!bin/bash\necho \"user_data script complete\""
+  default     = null
 }
 
 variable "instance_type" {
@@ -36,63 +35,47 @@ variable "instance_key" {
 
 variable "instance_volume_size" {
   description = "The size of the volume in gigabytes."
-  default     = "30"
+  default     = 30
 }
 
 variable "ebs_block_devices" {
   description = "Additional EBS block devices to attach to the instance."
-  type        = list(string)
   default     = []
 }
 
-// Workaround because we cannot use count since the passed policy can be computed in some cases.
 variable "instance_policy" {
   description = "A policy document to apply to the instance profile."
-
-  default = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "denynothing",
-            "Effect": "Deny",
-            "NotAction": "*",
-            "NotResource": "*"
-        }
-    ]
-}
-EOF
-
+  default     = null
 }
 
 variable "min_size" {
   description = "The minimum (and desired) size of the auto scale group."
-  default = "1"
+  default     = 1
 }
 
 variable "max_size" {
   description = "The maximum size of the auto scale group."
-  default = "3"
+  default     = 3
 }
 
 variable "health_check_type" {
   description = "EC2 or ELB. Controls how health checking is done."
-  default = "EC2"
+  default     = "EC2"
 }
 
 variable "await_signal" {
   description = "Await signals (WaitOnResourceSignals) for the autoscaling rolling update policy."
-  default = "false"
+  default     = false
 }
 
 variable "pause_time" {
   description = "Pause time for the autoscaling rolling update policy."
-  default = "PT5M"
+  default     = "PT5M"
 }
 
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
