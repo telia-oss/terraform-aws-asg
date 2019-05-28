@@ -8,8 +8,11 @@ vars:
   FILES:
     sh: find . -type f -name '*.tf' -not -path "**/.terraform/*"
 
-
 tasks:
+  default:
+    cmds:
+    - task: test
+
   directories:
     desc: List terraform directories.
     silent: true
@@ -22,6 +25,16 @@ tasks:
     cmds:
     - echo "{{.FILES}}"
 
+  bump-versions:
+    desc: Bump the terraform and aws provider versions.
+    silent: true
+    cmds:
+    - |
+      for f in $(echo "{{.FILES}}"); do 
+        sed -i '' -E "s/^([ ]*version[ ]*=[ ]*)\"([0-9]+\\.[0-9]+\\.[0-9]+)\"/\\1\"{{.PROVIDER_VERSION}}\"/g" $f
+        sed -i '' -E "s/^([ ]*required_version[ ]*=[ ]*)\"([0-9]+\\.[0-9]+\\.[0-9]+)\"/\\1\"{{.TERRAFORM_VERSION}}\"/g" $f
+      done
+
   fmt:
     desc: Check formatting of all terraform files.
     silent: true
@@ -29,7 +42,7 @@ tasks:
     - task: command
       vars:
         COMMAND: terraform fmt
-        ARGS: -check=true -write=false -list=false -recursive=false
+        ARGS: -check=true -write=true -list=false -recursive=false
         PIPE:
 
   validate:
@@ -47,22 +60,12 @@ tasks:
         ARGS: 
         PIPE:
     
-  tests:
+  test:
     desc: Run all tests.
     silent: true
     cmds:
     - task: fmt
     - task: validate
-
-  bump-versions:
-    desc: Bump the terraform and aws provider versions.
-    silent: true
-    cmds:
-    - |
-      for f in $(echo "{{.FILES}}"); do 
-        sed -i '' -E "s/^([ ]*version[ ]*=[ ]*)\"([0-9]+\\.[0-9]+\\.[0-9]+)\"/\\1\"{{.PROVIDER_VERSION}}\"/g" $f
-        sed -i '' -E "s/^([ ]*required_version[ ]*=[ ]*)\"([0-9]+\\.[0-9]+\\.[0-9]+)\"/\\1\"{{.TERRAFORM_VERSION}}\"/g" $f
-      done
 
   command:
     desc: Run a command on the directories. 
