@@ -60,22 +60,20 @@ resource "aws_launch_configuration" "main" {
   image_id             = var.instance_ami
   key_name             = var.instance_key
   user_data            = var.user_data
-  dynamic "ebs_block_device" {
-    for_each = [var.ebs_block_devices]
-    content {
-      # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
-      # which keys might be set in maps assigned here, so it has
-      # produced a comprehensive set here. Consider simplifying
-      # this after confirming which keys can be set in practice.
 
-      delete_on_termination = lookup(ebs_block_device.value, "delete_on_termination", null)
-      device_name           = ebs_block_device.value.device_name
-      encrypted             = lookup(ebs_block_device.value, "encrypted", null)
-      iops                  = lookup(ebs_block_device.value, "iops", null)
-      no_device             = lookup(ebs_block_device.value, "no_device", null)
-      snapshot_id           = lookup(ebs_block_device.value, "snapshot_id", null)
-      volume_size           = lookup(ebs_block_device.value, "volume_size", null)
-      volume_type           = lookup(ebs_block_device.value, "volume_type", null)
+  dynamic "ebs_block_device" {
+    iterator = device
+    for_each = [var.ebs_block_devices]
+
+    content {
+      device_name           = lookup(device.value, "device_name", null)
+      delete_on_termination = lookup(device.value, "delete_on_termination", null)
+      encrypted             = lookup(device.value, "encrypted", null)
+      iops                  = lookup(device.value, "iops", null)
+      no_device             = lookup(device.value, "no_device", null)
+      snapshot_id           = lookup(device.value, "snapshot_id", null)
+      volume_size           = lookup(device.value, "volume_size", null)
+      volume_type           = lookup(device.value, "volume_type", null)
     }
   }
 
