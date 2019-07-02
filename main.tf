@@ -63,7 +63,7 @@ resource "aws_launch_configuration" "main" {
 
   dynamic "ebs_block_device" {
     iterator = device
-    for_each = [var.ebs_block_devices]
+    for_each = var.ebs_block_devices
 
     content {
       device_name           = lookup(device.value, "device_name", null)
