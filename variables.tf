@@ -11,7 +11,7 @@ variable "vpc_id" {
 
 variable "subnet_ids" {
   description = "ID of subnets where instances can be provisioned."
-  type        = "list"
+  type        = list(string)
 }
 
 // Work around as default cannot be ""
@@ -41,7 +41,7 @@ variable "instance_volume_size" {
 
 variable "ebs_block_devices" {
   description = "Additional EBS block devices to attach to the instance."
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
@@ -62,35 +62,37 @@ variable "instance_policy" {
     ]
 }
 EOF
+
 }
 
 variable "min_size" {
   description = "The minimum (and desired) size of the auto scale group."
-  default     = "1"
+  default = "1"
 }
 
 variable "max_size" {
   description = "The maximum size of the auto scale group."
-  default     = "3"
+  default = "3"
 }
 
 variable "health_check_type" {
   description = "EC2 or ELB. Controls how health checking is done."
-  default     = "EC2"
+  default = "EC2"
 }
 
 variable "await_signal" {
   description = "Await signals (WaitOnResourceSignals) for the autoscaling rolling update policy."
-  default     = "false"
+  default = "false"
 }
 
 variable "pause_time" {
   description = "Pause time for the autoscaling rolling update policy."
-  default     = "PT5M"
+  default = "PT5M"
 }
 
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
-  type        = "map"
-  default     = {}
+  type = map(string)
+  default = {}
 }
+
