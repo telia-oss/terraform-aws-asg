@@ -55,7 +55,7 @@ module "asg" {
   source               = "../../"
   name_prefix          = "asg-volumes-test"
   vpc_id               = data.aws_vpc.main.id
-  subnet_ids           = [data.aws_subnet_ids.main.ids]
+  subnet_ids           = data.aws_subnet_ids.main.ids
   instance_ami         = data.aws_ami.linux2.id
   instance_policy      = data.aws_iam_policy_document.permissions.json
   instance_volume_size = "10"
