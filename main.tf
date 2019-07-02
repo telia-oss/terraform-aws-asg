@@ -90,42 +90,62 @@ resource "aws_launch_configuration" "main" {
 }
 
 locals {
-  asg_tags = merge(
-    var.tags,
-    {
-      "Name" = var.name_prefix
-    },
-  )
-}
-
-data "null_data_source" "autoscaling" {
-  count = length(local.asg_tags)
-
-  inputs = {
-    Key               = element(keys(local.asg_tags), count.index)
-    Value             = element(values(local.asg_tags), count.index)
-    PropagateAtLaunch = "TRUE"
-  }
+  asg_tags = [
+    for k, v in merge(var.tags, { "Name" = "${var.name_prefix}" }) : {
+      Key               = k
+      Value             = v
+      PropagateAtLaunch = "TRUE"
+    }
+  ]
 }
 
 resource "aws_cloudformation_stack" "main" {
   depends_on    = [aws_launch_configuration.main]
   name          = "${var.name_prefix}-asg"
-  template_body = data.template_file.main.rendered
+  template_body = <<EOF
+Description: "Autoscaling group created by Terraform."
+Resources:
+  AutoScalingGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      Cooldown: 300
+      HealthCheckType: "${var.health_check_type}"
+      HealthCheckGracePeriod: 300
+      LaunchConfigurationName: "${aws_launch_configuration.main.id}"
+      MinSize: "${var.min_size}"
+      MaxSize: "${var.max_size}"
+      MetricsCollection:
+        - Granularity: 1Minute
+          Metrics:
+            - GroupMinSize
+            - GroupMaxSize
+            - GroupDesiredCapacity
+            - GroupInServiceInstances
+            - GroupPendingInstances
+            - GroupStandbyInstances
+            - GroupTerminatingInstances
+            - GroupTotalInstances
+      Tags: ${jsonencode(local.asg_tags)}
+      TerminationPolicies:
+        - OldestLaunchConfiguration
+        - OldestInstance
+        - Default
+      VPCZoneIdentifier: ${jsonencode(var.subnet_ids)}
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MinInstancesInService: "${var.min_size}"
+        MaxBatchSize: "2"
+        WaitOnResourceSignals: "${var.await_signal}"
+        PauseTime: "${var.pause_time}"
+        SuspendProcesses:
+          - HealthCheck
+          - ReplaceUnhealthy
+          - AZRebalance
+          - AlarmNotification
+          - ScheduledActions
+Outputs:
+  AsgName:
+    Description: The name of the auto scaling group
+    Value: !Ref AutoScalingGroup
+EOF
 }
-
-data "template_file" "main" {
-  template = file("${path.module}/cloudformation.yml")
-
-  vars = {
-    launch_configuration = aws_launch_configuration.main.name
-    health_check_type    = var.health_check_type
-    await_signal         = var.await_signal
-    pause_time           = var.pause_time
-    min_size             = var.min_size
-    max_size             = var.max_size
-    subnets              = jsonencode(var.subnet_ids)
-    tags                 = jsonencode(data.null_data_source.autoscaling.*.outputs)
-  }
-}
-
