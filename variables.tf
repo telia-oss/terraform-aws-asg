@@ -51,60 +51,45 @@ variable "ebs_block_devices" {
   default     = []
 }
 
-// Workaround because we cannot use count since the passed policy can be computed in some cases.
 variable "instance_policy" {
   description = "A policy document to apply to the instance profile."
   type        = string
-
-  default = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "denynothing",
-            "Effect": "Deny",
-            "NotAction": "*",
-            "NotResource": "*"
-        }
-    ]
-}
-EOF
-
+  default     = ""
 }
 
 variable "min_size" {
   description = "The minimum (and desired) size of the auto scale group."
-  type = number
-  default = 1
+  type        = number
+  default     = 1
 }
 
 variable "max_size" {
   description = "The maximum size of the auto scale group."
-  type = number
-  default = 3
+  type        = number
+  default     = 3
 }
 
 variable "health_check_type" {
   description = "EC2 or ELB. Controls how health checking is done."
-  type = string
-  default = "EC2"
+  type        = string
+  default     = "EC2"
 }
 
 variable "await_signal" {
   description = "Await signals (WaitOnResourceSignals) for the autoscaling rolling update policy."
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "pause_time" {
   description = "Pause time for the autoscaling rolling update policy."
-  type = string
-  default = "PT5M"
+  type        = string
+  default     = "PT5M"
 }
 
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
