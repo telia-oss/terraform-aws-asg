@@ -16,11 +16,10 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
-// Work around as default cannot be ""
 variable "user_data" {
   description = "The user data to provide when launching the instance."
   type        = string
-  default     = "#!bin/bash\necho \"user_data script complete\""
+  default     = null
 }
 
 variable "instance_type" {
