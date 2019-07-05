@@ -1,4 +1,4 @@
 variable "name_prefix" {
   type    = string
-  default = "asg-default-example"
+  default = "asg-complete-example"
 }

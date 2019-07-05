@@ -68,13 +68,13 @@ resource "aws_launch_configuration" "main" {
 
     content {
       device_name           = lookup(device.value, "device_name", null)
-      delete_on_termination = lookup(device.value, "delete_on_termination", null)
-      encrypted             = lookup(device.value, "encrypted", null)
+      delete_on_termination = lookup(device.value, "delete_on_termination", true)
+      encrypted             = lookup(device.value, "encrypted", true)
       iops                  = lookup(device.value, "iops", null)
       no_device             = lookup(device.value, "no_device", null)
       snapshot_id           = lookup(device.value, "snapshot_id", null)
       volume_size           = lookup(device.value, "volume_size", null)
-      volume_type           = lookup(device.value, "volume_type", null)
+      volume_type           = lookup(device.value, "volume_type", "gp2")
     }
   }
 
