@@ -57,7 +57,9 @@ func TestDefaultExample(t *testing.T) {
 	}
 
 	for _, tc := range tests {
+		tc := tc // Source: https://gist.github.com/posener/92a55c4cd441fc5e5e85f27bca008721
 		t.Run(tc.description, func(t *testing.T) {
+			t.Parallel()
 			options := &terraform.Options{
 				TerraformDir: tc.directory,
 
