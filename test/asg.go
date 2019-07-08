@@ -1,8 +1,7 @@
-package test
+package asg
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
 	"time"
 
@@ -10,127 +9,60 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/ec2"
-
-	"github.com/gruntwork-io/terratest/modules/random"
-	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDefaultExample(t *testing.T) {
-	type expectations struct {
-		MinSize         int64
-		MaxSize         int64
-		DesiredCapacity int64
-		UserData        string
-		InstanceType    string
-		Volumes         []string
-		InstanceTags    map[string]string
-	}
+// Expectations for the autoscaling test suite.
+type Expectations struct {
+	MinSize         int64
+	MaxSize         int64
+	DesiredCapacity int64
+	UserData        string
+	InstanceType    string
+	Volumes         []string
+	InstanceTags    map[string]string
+}
 
-	tests := []struct {
-		description string
-		directory   string
-		name        string
-		region      string
-		expected    expectations
-	}{
-		{
-			description: "basic example",
-			directory:   "../examples/basic",
-			name:        fmt.Sprintf("asg-basic-test-%s", random.UniqueId()),
-			region:      "eu-west-1",
-			expected: expectations{
-				MinSize:         1,
-				MaxSize:         3,
-				DesiredCapacity: 1,
-				InstanceType:    "t3.micro",
-				InstanceTags: map[string]string{
-					"terraform":   "True",
-					"environment": "dev",
-				},
-			},
-		},
-		{
-			description: "complete example",
-			directory:   "../examples/complete",
-			name:        fmt.Sprintf("asg-complete-test-%s", random.UniqueId()),
-			region:      "eu-west-1",
-			expected: expectations{
-				MinSize:         2,
-				MaxSize:         4,
-				DesiredCapacity: 2,
-				UserData:        "#!bin/bash\necho hello world",
-				InstanceType:    "t3.micro",
-				Volumes: []string{
-					"/dev/xvdcz",
-				},
-				InstanceTags: map[string]string{
-					"terraform":   "True",
-					"environment": "dev",
-				},
-			},
-		},
-	}
+// RunTestSuite runs the test suite against the autoscaling group.
+func RunTestSuite(t *testing.T, name, region string, expected Expectations) {
+	var (
+		group     *autoscaling.Group
+		config    *autoscaling.LaunchConfiguration
+		instances []*ec2.Instance
+	)
+	sess := NewSession(t, region)
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			options := &terraform.Options{
-				TerraformDir: tc.directory,
+	group = DescribeAutoScalingGroup(t, sess, name)
+	assert.Equal(t, expected.MinSize, aws.Int64Value(group.MinSize))
+	assert.Equal(t, expected.MaxSize, aws.Int64Value(group.MaxSize))
+	assert.Equal(t, expected.DesiredCapacity, aws.Int64Value(group.DesiredCapacity))
 
-				Vars: map[string]interface{}{
-					"name_prefix": tc.name,
-					"region":      tc.region,
-				},
+	config = DescribeLaunchConfiguration(t, sess, aws.StringValue(group.LaunchConfigurationName))
+	assert.Equal(t, expected.UserData, DecodeUserData(t, config.UserData))
 
-				EnvVars: map[string]string{
-					"AWS_DEFAULT_REGION": tc.region,
-				},
+	// Wait for capacity in the autoscaling group (max 10min wait)
+	WaitForCapacity(t, sess, name, 10*time.Second, 10*time.Minute)
+	instances = DescribeInstances(t, sess, name)
+
+	for _, instance := range instances {
+		assert.Equal(t, expected.InstanceType, aws.StringValue(instance.InstanceType))
+
+		devices := GetInstanceBlockDeviceMappings(instance)
+		for _, v := range expected.Volumes {
+			if _, ok := devices[v]; !ok {
+				t.Errorf("missing block device on instance: %s", v)
 			}
+		}
 
-			defer terraform.Destroy(t, options)
-			terraform.InitAndApply(t, options)
-
-			var (
-				name      string
-				group     *autoscaling.Group
-				config    *autoscaling.LaunchConfiguration
-				instances []*ec2.Instance
-			)
-			name = terraform.Output(t, options, "id")
-			sess := NewSession(t, tc.region)
-
-			group = DescribeAutoScalingGroup(t, sess, name)
-			assert.Equal(t, tc.expected.MinSize, aws.Int64Value(group.MinSize))
-			assert.Equal(t, tc.expected.MaxSize, aws.Int64Value(group.MaxSize))
-			assert.Equal(t, tc.expected.DesiredCapacity, aws.Int64Value(group.DesiredCapacity))
-
-			config = DescribeLaunchConfiguration(t, sess, aws.StringValue(group.LaunchConfigurationName))
-			assert.Equal(t, tc.expected.UserData, DecodeUserData(t, config.UserData))
-
-			// Wait for capacity in the autoscaling group (max 10min wait)
-			WaitForCapacity(t, sess, name, 10*time.Second, 10*time.Minute)
-			instances = DescribeInstances(t, sess, name)
-
-			for _, instance := range instances {
-				assert.Equal(t, tc.expected.InstanceType, aws.StringValue(instance.InstanceType))
-
-				devices := GetInstanceBlockDeviceMappings(instance)
-				for _, v := range tc.expected.Volumes {
-					if _, ok := devices[v]; !ok {
-						t.Errorf("missing block device on instance: %s", v)
-					}
-				}
-
-				tags := GetInstanceTags(instance)
-				for k, want := range tc.expected.InstanceTags {
-					got, ok := tags[k]
-					if assert.True(t, ok) {
-						assert.Equal(t, want, got)
-					}
-				}
+		tags := GetInstanceTags(instance)
+		for k, want := range expected.InstanceTags {
+			got, ok := tags[k]
+			if assert.True(t, ok) {
+				assert.Equal(t, want, got)
 			}
-		})
+		}
 	}
+
 }
 
 func NewSession(t *testing.T, region string) *session.Session {
