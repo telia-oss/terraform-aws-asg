@@ -65,6 +65,7 @@ func TestDefaultExample(t *testing.T) {
 
 				Vars: map[string]interface{}{
 					"name_prefix": tc.name,
+					"region":      tc.region,
 				},
 
 				EnvVars: map[string]string{
