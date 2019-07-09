@@ -1,3 +1,3 @@
-## examples/default
+## examples/complete
 
-A Basic example which creates an autoscaling group in the default VPC with the default settings.
+An example which shows a more _complete_ usage of the module.
