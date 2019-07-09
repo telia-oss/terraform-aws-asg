@@ -18,10 +18,11 @@ tasks:
     - task: fmt
     - task: validate
 
-  set-versions:
-    desc: Set the terraform and aws provider versions.
+  tidy:
+    desc: Tidy all the things.
     silent: true
     cmds:
+    - go mod tidy
     - |
       for f in $(echo "{{.FILES}}"); do 
         sed -i '' -E "s/^([ ]*version[ ]*=[ ]*)\"([^\"]*)\"/\\1\"{{.PROVIDER_VERSION}}\"/g" $f
