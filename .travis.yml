@@ -15,6 +15,7 @@ before_script:
   - sudo unzip terraform.zip -d /opt/terraform
   - sudo ln -s /opt/terraform/terraform /usr/bin/terraform
   - rm -f terraform.zip
+  - curl -sL https://taskfile.dev/install.sh | sh
 
 script:
-  - go get -u -v github.com/go-task/task/v2/cmd/task && task test
+  - task test
