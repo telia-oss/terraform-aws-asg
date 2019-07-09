@@ -55,8 +55,6 @@ tasks:
         COMMAND: terraform validate
         ARGS: 
         PIPE: '> /dev/null'
-      env:
-        AWS_REGION=eu-west-1
 
   e2e:
     desc: Run the end 2 end test suite.
