@@ -15,7 +15,6 @@ tasks:
     desc: Run all tests.
     silent: true
     cmds:
-    - task: set-versions
     - task: fmt
     - task: validate
 
