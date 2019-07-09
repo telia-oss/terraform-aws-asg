@@ -18,4 +18,4 @@ before_script:
   - curl -sL https://taskfile.dev/install.sh | sh
 
 script:
-  - task test
+  - bin/task test
