@@ -51,12 +51,6 @@ variable "ebs_block_devices" {
   default     = []
 }
 
-variable "instance_policy" {
-  description = "A policy document to apply to the instance profile."
-  type        = string
-  default     = ""
-}
-
 variable "min_size" {
   description = "The minimum (and desired) size of the auto scale group."
   type        = number
@@ -91,5 +85,22 @@ variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
   type        = map(string)
   default     = {}
+}
+
+variable "instance_policy" {
+  description = "A policy document to apply to the instance profile."
+  type        = string
+  default     = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "placeholder",
+            "Effect": "Deny",
+            "NotAction": "*",
+            "NotResource": "*"
+        }
+    ]
+EOF
 }
 

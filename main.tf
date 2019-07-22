@@ -24,7 +24,6 @@ resource "aws_iam_instance_profile" "main" {
 }
 
 resource "aws_iam_role_policy" "main" {
-  count  = var.instance_policy == "" ? 0 : 1
   name   = "${var.name_prefix}-permissions"
   role   = aws_iam_role.main.id
   policy = var.instance_policy
