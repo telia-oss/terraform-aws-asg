@@ -54,7 +54,7 @@ variable "ebs_block_devices" {
 variable "instance_policy" {
   description = "A policy document to apply to the instance profile."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "min_size" {
