@@ -43,7 +43,7 @@ func TestDefaultExample(t *testing.T) {
 				MinSize:         2,
 				MaxSize:         4,
 				DesiredCapacity: 2,
-				UserData:        "#!bin/bash\necho hello world",
+				UserData:        []string{"#!bin/bash\necho hello world"},
 				InstanceType:    "t3.micro",
 				Volumes: []string{
 					"/dev/xvdcz",

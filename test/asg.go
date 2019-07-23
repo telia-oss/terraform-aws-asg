@@ -17,7 +17,7 @@ type Expectations struct {
 	MinSize         int64
 	MaxSize         int64
 	DesiredCapacity int64
-	UserData        string
+	UserData        []string
 	InstanceType    string
 	Volumes         []string
 	InstanceTags    map[string]string
@@ -38,7 +38,11 @@ func RunTestSuite(t *testing.T, name, region string, expected Expectations) {
 	assert.Equal(t, expected.DesiredCapacity, aws.Int64Value(group.DesiredCapacity))
 
 	config = DescribeLaunchConfiguration(t, sess, aws.StringValue(group.LaunchConfigurationName))
-	assert.Equal(t, expected.UserData, DecodeUserData(t, config.UserData))
+
+	userData := DecodeUserData(t, config.UserData)
+	for _, data := range expected.UserData {
+		assert.Contains(t, userData, data)
+	}
 
 	// Wait for capacity in the autoscaling group (max 10min wait)
 	WaitForCapacity(t, sess, name, 10*time.Second, 10*time.Minute)
