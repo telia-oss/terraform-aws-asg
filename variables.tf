@@ -101,6 +101,7 @@ variable "instance_policy" {
             "NotResource": "*"
         }
     ]
+}
 EOF
 }
 
