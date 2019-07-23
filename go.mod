@@ -1,4 +1,4 @@
-module github.com/telia-oss/terraform-aws-asg
+module github.com/telia-oss/terraform-aws-asg/v3
 
 go 1.12
 
