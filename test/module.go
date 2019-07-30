@@ -1,4 +1,4 @@
-package asg
+package module
 
 import (
 	"encoding/base64"

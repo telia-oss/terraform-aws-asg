@@ -1,4 +1,4 @@
-package asg_test
+package module_test
 
 import (
 	"fmt"
