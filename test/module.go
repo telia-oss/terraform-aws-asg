@@ -1,4 +1,4 @@
-package asg
+package module
 
 import (
 	"encoding/base64"
@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Expectations for the autoscaling test suite.
 type Expectations struct {
 	MinSize         int64
 	MaxSize         int64
@@ -23,7 +22,6 @@ type Expectations struct {
 	InstanceTags    map[string]string
 }
 
-// RunTestSuite runs the test suite against the autoscaling group.
 func RunTestSuite(t *testing.T, name, region string, expected Expectations) {
 	var (
 		group     *autoscaling.Group
