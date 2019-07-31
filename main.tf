@@ -27,7 +27,16 @@ resource "aws_iam_instance_profile" "main" {
 resource "aws_iam_role_policy" "main" {
   name   = "${var.name_prefix}-permissions"
   role   = aws_iam_role.main.id
-  policy = var.instance_policy
+  policy = coalesce(var.instance_policy, data.aws_iam_policy_document.placeholder.json)
+}
+
+data "aws_iam_policy_document" "placeholder" {
+  statement {
+    sid           = "placeholder"
+    effect        = "Deny"
+    not_actions   = ["*"]
+    not_resources = ["*"]
+  }
 }
 
 resource "aws_security_group" "main" {
