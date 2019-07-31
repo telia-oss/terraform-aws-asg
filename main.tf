@@ -4,6 +4,7 @@
 resource "aws_iam_role" "main" {
   name               = "${var.name_prefix}-role"
   assume_role_policy = data.aws_iam_policy_document.main.json
+  tags               = merge(var.tags, { "Name" = "${var.name_prefix}-role" })
 }
 
 data "aws_iam_policy_document" "main" {
