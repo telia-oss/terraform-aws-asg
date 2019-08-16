@@ -46,7 +46,6 @@ func TestModule(t *testing.T) {
 				UserData: []string{
 					`echo "Cloud init part 1"`,
 					`echo "Cloud init part 2"`,
-					`echo "test"`,
 				},
 				IsGzippedUserData: true,
 				InstanceType:      "t3.micro",
