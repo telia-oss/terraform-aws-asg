@@ -1,7 +1,10 @@
 package module
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/base64"
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -13,13 +16,14 @@ import (
 )
 
 type Expectations struct {
-	MinSize         int64
-	MaxSize         int64
-	DesiredCapacity int64
-	UserData        []string
-	InstanceType    string
-	Volumes         []string
-	InstanceTags    map[string]string
+	MinSize           int64
+	MaxSize           int64
+	DesiredCapacity   int64
+	UserData          []string
+	IsGzippedUserData bool
+	InstanceType      string
+	Volumes           []string
+	InstanceTags      map[string]string
 }
 
 func RunTestSuite(t *testing.T, name, region string, expected Expectations) {
@@ -37,7 +41,7 @@ func RunTestSuite(t *testing.T, name, region string, expected Expectations) {
 
 	config = DescribeLaunchConfiguration(t, sess, aws.StringValue(group.LaunchConfigurationName))
 
-	userData := DecodeUserData(t, config.UserData)
+	userData := DecodeUserData(t, config.UserData, expected.IsGzippedUserData)
 	for _, data := range expected.UserData {
 		assert.Contains(t, userData, data)
 	}
@@ -77,12 +81,26 @@ func NewSession(t *testing.T, region string) *session.Session {
 	return sess
 }
 
-func DecodeUserData(t *testing.T, data *string) string {
+func DecodeUserData(t *testing.T, data *string, isGzipped bool) string {
 	b, err := base64.StdEncoding.DecodeString(aws.StringValue(data))
 	if err != nil {
 		t.Fatalf("failed to decode user data: %s", err)
 	}
-	return string(b)
+
+	var s []byte
+	if isGzipped {
+		r, err := gzip.NewReader(bytes.NewReader(b))
+		if err != nil {
+			t.Fatalf("failed to initialize gzip reader: %s", err)
+		}
+		s, err = ioutil.ReadAll(r)
+		if err != nil {
+			t.Fatalf("failed to read gzip data: %s", err)
+		}
+	} else {
+		s = b
+	}
+	return string(s)
 }
 
 func GetInstanceBlockDeviceMappings(instance *ec2.Instance) map[string]*ec2.InstanceBlockDeviceMapping {

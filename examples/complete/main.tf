@@ -67,6 +67,25 @@ module "asg" {
   }
 }
 
+data "template_cloudinit_config" "userdata" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    content_type = "text/cloud-config"
+    content      = <<EOF
+#cloud-config
+runcmd:
+  - echo "Cloud init part 1"
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = "echo \"Cloud init part 2\""
+  }
+}
+
 data "aws_iam_policy_document" "permissions" {
   statement {
     effect = "Allow"
