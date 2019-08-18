@@ -50,7 +50,7 @@ module "asg" {
   instance_volume_size = 10
   min_size             = 2
   max_size             = 4
-  user_data            = "#!bin/bash\necho hello world"
+  user_data_base64     = data.template_cloudinit_config.user_data.rendered
 
   ebs_block_devices = [
     {
@@ -64,6 +64,25 @@ module "asg" {
   tags = {
     terraform   = "True"
     environment = "dev"
+  }
+}
+
+data "template_cloudinit_config" "user_data" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    content_type = "text/cloud-config"
+    content      = <<EOF
+#cloud-config
+runcmd:
+  - echo "Cloud init part 1"
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = "echo \"Cloud init part 2\""
   }
 }
 

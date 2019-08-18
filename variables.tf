@@ -22,6 +22,12 @@ variable "user_data" {
   default     = null
 }
 
+variable "user_data_base64" {
+  description = "Use this instead of user_data whenever the value is not a valid UTF-8 string."
+  type        = string
+  default     = null
+}
+
 variable "instance_type" {
   description = "Type of instance to provision."
   type        = string

@@ -43,8 +43,12 @@ func TestModule(t *testing.T) {
 				MinSize:         2,
 				MaxSize:         4,
 				DesiredCapacity: 2,
-				UserData:        []string{"#!bin/bash\necho hello world"},
-				InstanceType:    "t3.micro",
+				UserData: []string{
+					`echo "Cloud init part 1"`,
+					`echo "Cloud init part 2"`,
+				},
+				IsGzippedUserData: true,
+				InstanceType:      "t3.micro",
 				Volumes: []string{
 					"/dev/xvdcz",
 				},

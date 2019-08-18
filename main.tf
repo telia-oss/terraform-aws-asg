@@ -70,6 +70,7 @@ resource "aws_launch_configuration" "main" {
   image_id             = var.instance_ami
   key_name             = var.instance_key
   user_data            = var.user_data
+  user_data_base64     = var.user_data_base64
 
   dynamic "ebs_block_device" {
     iterator = device
