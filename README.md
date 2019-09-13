@@ -1,6 +1,6 @@
 ## Autoscaling group
 
-[![Build Status](https://travis-ci.com/telia-oss/terraform-aws-asg.svg?branch=master)](https://travis-ci.com/telia-oss/terraform-aws-asg)
+[![workflow](https://github.com/telia-oss/terraform-aws-asg/workflows/workflow/badge.svg)](https://github.com/telia-oss/terraform-aws-asg/actions)
 
 Easy way of setting up an autoscaling group which supports rolling updates, which takes care of creating:
 
