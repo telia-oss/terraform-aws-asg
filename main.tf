@@ -63,14 +63,15 @@ resource "aws_security_group_rule" "egress" {
 }
 
 resource "aws_launch_configuration" "main" {
-  name_prefix          = "${var.name_prefix}-asg-"
-  instance_type        = var.instance_type
-  iam_instance_profile = aws_iam_instance_profile.main.name
-  security_groups      = [aws_security_group.main.id]
-  image_id             = var.instance_ami
-  key_name             = var.instance_key
-  user_data            = var.user_data
-  user_data_base64     = var.user_data_base64
+  name_prefix           = "${var.name_prefix}-asg-"
+  instance_type         = var.instance_type
+  iam_instance_profile  = aws_iam_instance_profile.main.name
+  security_groups       = [aws_security_group.main.id]
+  image_id              = var.instance_ami
+  key_name              = var.instance_key
+  user_data             = var.user_data
+  user_data_base64      = var.user_data_base64
+  wait_for_elb_capacity = "1"
 
   dynamic "ebs_block_device" {
     iterator = device
