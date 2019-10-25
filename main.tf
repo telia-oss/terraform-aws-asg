@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "placeholder" {
 resource "aws_security_group" "main" {
   name        = "${var.name_prefix}-sg"
   description = "Terraformed security group."
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc_id != null ? var.vpc_id : data.aws_subnet.selected.vpc_id
 
   tags = merge(
     var.tags,
