@@ -66,6 +66,24 @@ variable "instance_volume_size" {
   default     = 30
 }
 
+variable "encrypt_root_volume" {
+  description = "Encrypt root volume."
+  type        = bool
+  default     = false
+}
+
+variable "root_volume_iops" {
+  description = "The amount of provisioned IOPS. This must be set with a volume_type of 'io1`."
+  type        = number
+  default     = null
+}
+
+variable "root_volume_type" {
+  description = "The type of volume. Can be `standard`, `gp2`, or `io1`. "
+  type        = string
+  default     = "gp2"
+}
+
 variable "ebs_block_devices" {
   description = "Additional EBS block devices to attach to the instance."
   type        = list(map(string))
@@ -108,3 +126,32 @@ variable "tags" {
   default     = {}
 }
 
+variable "associate_public_ip_address" {
+  description = "Associate a public ip address with an instance in a VPC"
+  type        = bool
+  default     = false
+}
+
+variable "enable_monitoring" {
+  description = "Enables/disables detailed monitoring. This is enabled by default."
+  type        = bool
+  default     = true
+}
+
+variable "ebs_optimized" {
+  description = "If true, the launched EC2 instance will be EBS-optimized"
+  type        = bool
+  default     = false
+}
+
+variable "spot_price" {
+  description = "The price to use for reserving spot instances"
+  type        = string
+  default     = ""
+}
+
+variable "placement_tenancy" {
+  description = "The tenancy of the instance. Valid values are 'default' or 'dedicated'"
+  type        = string
+  default     = "default"
+}
