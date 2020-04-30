@@ -148,6 +148,7 @@ Resources:
         - OldestLaunchConfiguration
         - OldestInstance
         - Default
+      TargetGroupARNs: ${jsonencode(var.target_group_arns)}
       VPCZoneIdentifier: ${jsonencode(var.subnet_ids)}
     UpdatePolicy:
       AutoScalingRollingUpdate:

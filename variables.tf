@@ -102,6 +102,12 @@ variable "max_size" {
   default     = 3
 }
 
+variable "target_group_arns" {
+  description = "A list of Amazon Resource Names (ARN) of target groups to associate with the Auto Scaling group."
+  type        = list
+  default     = []
+}
+
 variable "health_check_type" {
   description = "EC2 or ELB. Controls how health checking is done."
   type        = string
