@@ -101,7 +101,7 @@ resource "aws_launch_configuration" "main" {
 
 locals {
   asg_tags = [
-    for k, v in merge(var.tags, { "Name" = "${var.name_prefix}" }) : {
+    for k, v in merge(var.tags, { "Name" = var.name_prefix }) : {
       Key               = k
       Value             = v
       PropagateAtLaunch = "TRUE"
