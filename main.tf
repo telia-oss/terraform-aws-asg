@@ -63,14 +63,15 @@ resource "aws_security_group_rule" "egress" {
 }
 
 resource "aws_launch_configuration" "main" {
-  name_prefix          = "${var.name_prefix}-asg-"
-  instance_type        = var.instance_type
-  iam_instance_profile = aws_iam_instance_profile.main.name
-  security_groups      = [aws_security_group.main.id]
-  image_id             = var.instance_ami
-  key_name             = var.instance_key
-  user_data            = var.user_data
-  user_data_base64     = var.user_data_base64
+  name_prefix           = "${var.name_prefix}-asg-"
+  instance_type         = var.instance_type
+  iam_instance_profile  = aws_iam_instance_profile.main.name
+  security_groups       = [aws_security_group.main.id]
+  image_id              = var.instance_ami
+  key_name              = var.instance_key
+  user_data             = var.user_data
+  user_data_base64      = var.user_data_base64
+  wait_for_elb_capacity = "1"
 
   dynamic "ebs_block_device" {
     iterator = device
@@ -109,53 +110,13 @@ locals {
   ]
 }
 
-resource "aws_cloudformation_stack" "main" {
-  depends_on    = [aws_launch_configuration.main]
-  name          = "${var.name_prefix}-asg"
-  template_body = <<EOF
-Description: "Autoscaling group created by Terraform."
-Resources:
-  AutoScalingGroup:
-    Type: "AWS::AutoScaling::AutoScalingGroup"
-    Properties:
-      Cooldown: 300
-      HealthCheckType: "${var.health_check_type}"
-      HealthCheckGracePeriod: 300
-      LaunchConfigurationName: "${aws_launch_configuration.main.id}"
-      MinSize: "${var.min_size}"
-      MaxSize: "${var.max_size}"
-      MetricsCollection:
-        - Granularity: 1Minute
-          Metrics:
-            - GroupMinSize
-            - GroupMaxSize
-            - GroupDesiredCapacity
-            - GroupInServiceInstances
-            - GroupPendingInstances
-            - GroupStandbyInstances
-            - GroupTerminatingInstances
-            - GroupTotalInstances
-      Tags: ${jsonencode(local.asg_tags)}
-      TerminationPolicies:
-        - OldestLaunchConfiguration
-        - OldestInstance
-        - Default
-      VPCZoneIdentifier: ${jsonencode(var.subnet_ids)}
-    UpdatePolicy:
-      AutoScalingRollingUpdate:
-        MinInstancesInService: "${var.min_size}"
-        MaxBatchSize: "2"
-        WaitOnResourceSignals: "${var.await_signal}"
-        PauseTime: "${var.pause_time}"
-        SuspendProcesses:
-          - HealthCheck
-          - ReplaceUnhealthy
-          - AZRebalance
-          - AlarmNotification
-          - ScheduledActions
-Outputs:
-  AsgName:
-    Description: The name of the auto scaling group
-    Value: !Ref AutoScalingGroup
-EOF
+resource "aws_autoscaling_group" "main" {
+  depends_on            = [aws_launch_configuration.main]
+  name                  = "${var.name_prefix}-asg"
+  max_size              = "${var.min_size}"
+  min_size              = "${var.max_size}"
+  launch_configuration  = "${aws_launch_configuration.main.name}"
+  vpc_zone_identifier   = "${var.subnet_ids}"
+  health_check_type     = "${var.health_check_type}"
+  tags                  = "${var.tags}"
 }

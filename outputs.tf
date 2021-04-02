@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 output "id" {
   description = "The autoscaling group id (name)."
-  value       = aws_cloudformation_stack.main.outputs["AsgName"]
+  value       = aws_autoscaling_group.main.name
 }
 
 output "role_name" {
