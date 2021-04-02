@@ -72,6 +72,12 @@ resource "aws_launch_configuration" "main" {
   user_data            = var.user_data
   user_data_base64     = var.user_data_base64
 
+  associate_public_ip_address = var.associate_public_ip_address
+  enable_monitoring           = var.enable_monitoring
+  spot_price                  = var.spot_price
+  placement_tenancy           = var.spot_price == "" ? var.placement_tenancy : ""
+  ebs_optimized               = var.ebs_optimized
+
   dynamic "ebs_block_device" {
     iterator = device
     for_each = var.ebs_block_devices
@@ -89,9 +95,11 @@ resource "aws_launch_configuration" "main" {
   }
 
   root_block_device {
-    volume_type           = "gp2"
+    volume_type           = var.root_volume_type
     volume_size           = var.instance_volume_size
     delete_on_termination = true
+    encrypted             = var.encrypt_root_volume
+    iops                  = var.root_volume_iops
   }
 
   lifecycle {
@@ -140,6 +148,7 @@ Resources:
         - OldestLaunchConfiguration
         - OldestInstance
         - Default
+      TargetGroupARNs: ${jsonencode(var.target_group_arns)}
       VPCZoneIdentifier: ${jsonencode(var.subnet_ids)}
     UpdatePolicy:
       AutoScalingRollingUpdate:
